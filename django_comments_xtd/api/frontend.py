@@ -25,7 +25,7 @@ class CommentBoxDriver(object):
     def get_queryset(cls, ctype, obj, request):
         return XtdComment.objects.filter(
             content_type=ctype,
-            object_pk=obj.pk,
+            object_pk=obj._get_pk_val(),
             site__pk=get_current_site_id(request),
             is_public=True,
         )
