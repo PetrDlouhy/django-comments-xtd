@@ -394,7 +394,7 @@ def flag(request, comment_id, next_url=None, **kwargs):
         get_comment_model(), pk=comment_id,
         site__pk=get_current_site_id(request))
     if not get_app_model_options(comment=comment)['allow_flagging']:
-        ctype = ContentType.objects.get_for_model(comment.content_object)
+        ctype = comment.content_type
         raise Http404("Comments posted to instances of '%s.%s' are not "
                       "explicitly allowed to receive 'removal suggestion' "
                       "flags. Check the COMMENTS_XTD_APP_MODEL_OPTIONS "
@@ -427,7 +427,7 @@ def like(request, comment_id, next_url=None, **kwargs):
     comment = get_object_or_404(get_comment_model(), pk=comment_id,
                                 site__pk=get_current_site_id(request))
     if not get_app_model_options(comment=comment)['allow_feedback']:
-        ctype = ContentType.objects.get_for_model(comment.content_object)
+        ctype = comment.content_type
         raise Http404("Comments posted to instances of '%s.%s' are not "
                       "explicitly allowed to receive 'liked it' flags. "
                       "Check the COMMENTS_XTD_APP_MODEL_OPTIONS "
@@ -464,7 +464,7 @@ def dislike(request, comment_id, next_url=None, **kwargs):
     comment = get_object_or_404(get_comment_model(), pk=comment_id,
                                 site__pk=get_current_site_id(request))
     if not get_app_model_options(comment=comment)['allow_feedback']:
-        ctype = ContentType.objects.get_for_model(comment.content_object)
+        ctype = comment.content_type
         raise Http404("Comments posted to instances of '%s.%s' are not "
                       "explicitly allowed to receive 'disliked it' flags. "
                       "Check the COMMENTS_XTD_APP_MODEL_OPTIONS "
