@@ -15,6 +15,38 @@ from django_comments_xtd.utils import (
 XtdComment = get_comment_model()
 
 
+def get_id_field(ctype):
+    if type(ctype) == str:
+        ctype_key = ctype
+    else:
+        ctype_key = "%s.%s" % (ctype.app_label, ctype.model)
+    options = get_app_model_options(content_type=ctype_key)
+    return options.get('id_field', 'pk')
+
+
+def get_id_field_value(obj, ctype):
+    return getattr(obj, get_id_field(ctype))
+
+
+class PKCommentSecurityForm(CommentSecurityForm):
+    def __init__(self, *args, **kwargs):
+        self.target_object_pk = kwargs.pop('target_object_pk')
+        super().__init__(*args, **kwargs)
+
+    def generate_security_data(self, *args, **kwargs):
+        security_dict = super().generate_security_data(*args, **kwargs)
+        security_dict['object_pk'] = str(self.target_object_pk)
+        return security_dict
+
+    def initial_security_hash(self, timestamp):
+        initial_security_dict = {
+            'content_type': str(self.target_object._meta),
+            'object_pk': str(self.target_object_pk),
+            'timestamp': str(timestamp),
+        }
+        return self.generate_security_hash(**initial_security_dict)
+
+
 def commentbox_props(obj, user, request=None):
     """
     Returns a JSON object with the initial props for the CommentBox component.
@@ -58,10 +90,11 @@ def commentbox_props(obj, user, request=None):
         """do not inject request to avoid http:// urls on https:// only sites"""
         return reverse(*args, **kwargs)
 
-    form = CommentSecurityForm(obj)
     ctype = ContentType.objects.get_for_model(obj)
+    object_pk = get_id_field_value(obj, ctype)
+    form = PKCommentSecurityForm(obj, target_object_pk=object_pk)
     queryset = XtdComment.objects.filter(content_type=ctype,
-                                         object_pk=obj._get_pk_val(),
+                                         object_pk=object_pk,
                                          site__pk=get_current_site_id(request),
                                          is_public=True)
     ctype_slug = "%s-%s" % (ctype.app_label, ctype.model)
@@ -86,10 +119,10 @@ def commentbox_props(obj, user, request=None):
         "flag_url": _reverse("comments-flag", args=(0,)),
         "list_url": _reverse('comments-xtd-api-list',
                              kwargs={'content_type': ctype_slug,
-                                     'object_pk': obj._get_pk_val()}),
+                                     'object_pk': object_pk}),
         "count_url": _reverse('comments-xtd-api-count',
                               kwargs={'content_type': ctype_slug,
-                                      'object_pk': obj._get_pk_val()}),
+                                      'object_pk': object_pk}),
         "send_url": _reverse("comments-xtd-api-create"),
         "preview_url": _reverse("comments-xtd-api-preview"),
         "form": {

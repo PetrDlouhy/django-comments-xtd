@@ -4,6 +4,7 @@ from django.utils.translation import gettext_lazy as _
 
 from django_comments.forms import CommentForm
 
+from django_comments_xtd.api.frontend import get_id_field_value
 from django_comments_xtd.conf import settings
 from django_comments_xtd.models import TmpXtdComment
 
@@ -64,5 +65,5 @@ class XtdCommentForm(CommentForm):
         data.update({'thread_id': 0, 'level': 0, 'order': 1,
                      'parent_id': self.cleaned_data['reply_to'],
                      'followup': self.cleaned_data['followup'],
-                     'content_object': target})
+                     })
         return data

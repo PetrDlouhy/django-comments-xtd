@@ -12,6 +12,7 @@ from django_comments.signals import comment_will_be_posted, comment_was_posted
 from rest_framework import exceptions, serializers
 
 from django_comments_xtd import get_model, signed, views
+from django_comments_xtd.api.frontend import get_id_field
 from django_comments_xtd.conf import settings
 from django_comments_xtd.models import (TmpXtdComment, XtdComment,
                                         LIKEDIT_FLAG, DISLIKEDIT_FLAG,
@@ -88,7 +89,7 @@ class WriteCommentSerializer(serializers.Serializer):
                                                "object_pk field.")
         try:
             model = apps.get_model(*ctype.split(".", 1))
-            target = model._default_manager.get(pk=object_pk)
+            target = model._default_manager.get(**{get_id_field(ctype): object_pk})
             whocan = get_app_model_options(content_type=ctype)['who_can_post']
         except (AttributeError, TypeError, LookupError):
             raise serializers.ValidationError("Invalid content_type value: %r"
