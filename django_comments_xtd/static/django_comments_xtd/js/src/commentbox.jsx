@@ -180,17 +180,19 @@ export class CommentBox extends React.Component {
   }
 
   load_count() {
-    $.ajax({
-      url: this.state.props.count_url,
-      dataType: 'json',
-      cache: false,
-      success: function(data) {
-        this.setState({counter: data.count});
-      }.bind(this),
-      error: function(xhr, status, err) {
-        console.error(this.state.props.count_url, status, err.toString());
-      }.bind(this)
-    });
+    if(this.state.props.count_url !== undefined){
+       $.ajax({
+         url: this.state.props.count_url,
+         dataType: 'json',
+         cache: false,
+         success: function(data) {
+           this.setState({counter: data.count});
+         }.bind(this),
+         error: function(xhr, status, err) {
+           console.error(this.state.props.count_url, status, err.toString());
+         }.bind(this)
+       });
+    };
   }
 
   componentDidMount() {
