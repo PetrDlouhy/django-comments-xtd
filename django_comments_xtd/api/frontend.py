@@ -13,6 +13,9 @@ from django_comments_xtd.utils import (
 )
 
 
+COMMENTS_FOR_CONCRETE_MODEL = getattr(settings, 'COMMENTS_FOR_CONCRETE_MODEL', True)
+
+
 XtdComment = get_comment_model()
 
 
@@ -85,7 +88,9 @@ class CommentBoxDriver(object):
         """
 
         form = CommentSecurityForm(obj)
-        ctype = ContentType.objects.get_for_model(obj)
+        ctype = ContentType.objects.get_for_model(
+            obj, for_concrete_model=COMMENTS_FOR_CONCRETE_MODEL,
+        )
         queryset = cls.get_queryset(ctype, obj, request)
         ctype_slug = "%s-%s" % (ctype.app_label, ctype.model)
         ctype_key = "%s.%s" % (ctype.app_label, ctype.model)
