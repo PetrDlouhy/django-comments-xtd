@@ -144,9 +144,10 @@ class WriteCommentSerializer(serializers.Serializer):
         #  * Comment rejected (http 403),
         #  * Comment have bad data (http 400).
         site = get_current_site(self.request)
+        COMMENTS_FOR_CONCRETE_MODEL = getattr(settings, 'COMMENTS_FOR_CONCRETE_MODEL', True)
         resp = {
             'code': -1,
-            'comment': self.form.get_comment_object(site_id=site.id)
+            'comment': self.form.get_comment_object(site_id=site.id, for_concrete_model=COMMENTS_FOR_CONCRETE_MODEL),
         }
         resp['comment'].ip_address = self.request.META.get("REMOTE_ADDR", None)
 

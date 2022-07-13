@@ -56,8 +56,8 @@ class XtdCommentForm(CommentForm):
     def get_comment_model(self):
         return TmpXtdComment
 
-    def get_comment_create_data(self, site_id=None):
-        data = super(CommentForm, self).get_comment_create_data(site_id=site_id)
+    def get_comment_create_data(self, site_id=None, **kwargs):
+        data = super(CommentForm, self).get_comment_create_data(site_id=site_id, **kwargs)
         ctype = data.get('content_type')
         object_pk = data.get('object_pk')
         model = apps.get_model(ctype.app_label, ctype.model)
