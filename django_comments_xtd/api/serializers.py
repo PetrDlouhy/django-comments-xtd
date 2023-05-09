@@ -80,6 +80,9 @@ class WriteCommentSerializer(serializers.Serializer):
                         "Max thread level reached")
         return value
 
+    def get_form(self):
+        return get_form()
+
     def validate(self, data):
         ctype = data.get("content_type")
         object_pk = data.get("object_pk")
@@ -125,7 +128,7 @@ class WriteCommentSerializer(serializers.Serializer):
                     "security_hash": secform['security_hash'].value()
                 })
                 break
-        self.form = get_form()(target, data=data)
+        self.form = self.get_form()(target, data=data)
 
         # Check security information.
         if self.form.security_errors():
